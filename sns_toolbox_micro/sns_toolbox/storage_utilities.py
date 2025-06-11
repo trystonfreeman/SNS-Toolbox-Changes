@@ -38,5 +38,4 @@ def load(filename) -> Backend:
         for x,y in params.items():
             if type(y)==list:
                 params[x] = np.array(y)
-        model = SNS_Numpy(params)
-    return model
+    return params
