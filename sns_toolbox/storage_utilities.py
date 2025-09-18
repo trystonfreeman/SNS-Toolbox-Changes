@@ -2,41 +2,40 @@
 Utility functions for saving and loading compiled SNS networks.
 """
 from sns_toolbox.backends import Backend,SNS_Numpy
+import os
 import json
+import numpy as np
+import torch
+import pickle
 
-# Allows Storage Utilities to work on micropython installations with ulab
-try:
-    from ulab import numpy as np
-    micropython = True
-except ImportError:
-    import numpy as np
-    import torch
-    import pickle
-    micropython = False
-def save(model: Backend, filename: str,params: dict = None) -> None:
+def save(model: Backend, file_path: str) -> None:
 
-    # Required if using model for micropython
-    if params != None:
-        print("Saved model will only work on micro-SNS!")
+    file_name, file_extension = os.path.splitext(file_path)
+
+    # Determines whether file is saved as new .json or old .sns
+    if file_extension == ".json":
+        params = model.params
+
         # Converts ndarrays to lists that JSON module can handle
-        for x,y in params:
+        for x,y in model.params:
             if isinstance(y,torch.Tensor):
-                print('Pytorch not compatable with micro-SNS!')
+                print('Torch Saving Not Implemented')
                 return
             if isinstance(y,np.ndarray):
                 params[x] = y.tolist()
-        json.dump(params, open(filename, 'wb'))
+        json.dump(params, open(file_path, 'w'))
     else:
-        pickle.dump(model, open(filename,'wb'))
+        pickle.dump(model, open(file_path, 'wb'))
 
-def load(filename) -> Backend:
-    if not micropython:
-        model = pickle.load(open(filename, 'rb'))
-    else:
-        f = open(filename)
+
+def load(file_path) -> Backend:
+    file_name, file_extension = os.path.splitext(file_path)
+    if file_extension == ".json":
+        f = open(file_path)
         params = json.loads(f.read())
         for x,y in params.items():
             if type(y)==list:
                 params[x] = np.array(y)
-        model = SNS_Numpy(params)
+    else:
+        model = pickle.load(open(file_path, 'rb'))
     return model
