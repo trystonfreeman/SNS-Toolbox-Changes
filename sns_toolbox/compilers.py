@@ -599,7 +599,7 @@ def __compile_numpy__(network, dt=0.01, debug=False) -> SNS_Numpy:
             print('B_last:')
             print(c_gate_last)
 
-    return model, params # Params required to import model to micropython
+    return model
 
 def __compile_torch__(network, dt=0.01, debug=False, device='cpu', return_params=False) -> SNS_Torch:
     if debug:

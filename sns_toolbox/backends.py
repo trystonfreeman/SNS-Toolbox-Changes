@@ -27,6 +27,8 @@ class Backend:
         raise NotImplementedError
 
     def set_params(self, params: Dict) -> None:
+        self.params = params
+        # Same info just more convenient
         self.dt = params['dt']
         self.name = params['name']
         self.spiking = params['spiking']
